@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Cambia a "postgresql" en producción y actualiza DATABASE_URL en .env
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Presupuesto por categoría (ej: Alimentación, Transporte, Entretenimiento)
+// ---------------------------------------------------------------------------
+model Budget {
+  id          String    @id @default(cuid())
+  category    String
+  /// Monto límite del presupuesto
+  limitAmount Float
+  /// "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY"
+  period      String    @default("MONTHLY")
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([category])
+  @@index([period])
+  @@map("budgets")
+}

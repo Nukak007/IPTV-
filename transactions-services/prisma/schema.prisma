@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Cambia a "postgresql" en producción y actualiza DATABASE_URL en .env
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Categoría de transacción (ej: Alimentación, Transporte, Servicios)
+// ---------------------------------------------------------------------------
+model Category {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  icon         String? // emoji o nombre de ícono
+  color        String? // hex color, ej: "#FF6B6B"
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+
+  @@map("categories")
+}
+
+
+
+model Transaction {
+  id          String    @id @default(cuid())
+  /// Monto positivo. Se almacena como Float en SQLite, Decimal en PostgreSQL.
+  amount      Float
+  /// "INCOME" | "EXPENSE"
+  type        String    @default("EXPENSE")
+  description String?
+  date        DateTime
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([categoryId])
+  @@index([date])
+  @@map("transactions")
+}
